@@ -3,7 +3,7 @@
 
 """Snippet representation after parsing."""
 
-import re
+import regex
 
 import vim
 import textwrap
@@ -15,7 +15,7 @@ from UltiSnips.text_objects import SnippetInstance
 from UltiSnips.position import Position
 from UltiSnips.text_objects.python_code import SnippetUtilForAction
 
-__WHITESPACE_SPLIT = re.compile(r"\s")
+__WHITESPACE_SPLIT = regex.compile(r"\s")
 
 
 class _SnippetUtilCursor:
@@ -53,7 +53,7 @@ class _SnippetUtilCursor:
 
 def split_at_whitespace(string):
     """Like string.split(), but keeps empty words as empty words."""
-    return re.split(__WHITESPACE_SPLIT, string)
+    return regex.split(__WHITESPACE_SPLIT, string)
 
 
 def _words_for_line(trigger, before, num_words=None):
@@ -80,8 +80,8 @@ class SnippetDefinition:
 
     """Represents a snippet as parsed from a file."""
 
-    _INDENT = re.compile(r"^[ \t]*")
-    _TABS = re.compile(r"^\t*")
+    _INDENT = regex.compile(r"^[ \t]*")
+    _TABS = regex.compile(r"^\t*")
 
     def __init__(
         self,
@@ -126,7 +126,7 @@ class SnippetDefinition:
         If so, set _last_re and _matched.
 
         """
-        for match in re.finditer(self._trigger, trigger):
+        for match in regex.finditer(self._trigger, trigger):
             if match.end() != len(trigger):
                 continue
             else:
@@ -158,7 +158,7 @@ class SnippetDefinition:
     def _eval_code(self, code, additional_locals={}):
         code = "\n".join(
             [
-                "import re, os, vim, string, random",
+                "import regex, os, vim, string, random",
                 "\n".join(self._globals.get("!p", [])).replace("\r\n", "\n"),
                 code,
             ]

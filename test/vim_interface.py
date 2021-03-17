@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 import os
-import re
+import regex
 import shutil
 import subprocess
 import tempfile
@@ -184,7 +184,7 @@ class VimInterfaceTmux(VimInterface):
             ["tmux", "-V"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
         ).communicate()
         stdout = stdout.decode("utf-8")
-        m = re.match(r"tmux (\d+).(\d+)", stdout)
+        m = regex.match(r"tmux (?:next-)?(\d+).(\d+)", stdout)
         if not m or not (int(m.group(1)), int(m.group(2))) >= (1, 8):
             raise RuntimeError("Need at least tmux 1.8, you have %s." % stdout.strip())
 
@@ -220,7 +220,7 @@ class VimInterfaceTmuxNeovim(VimInterfaceTmux):
 
 
 class VimInterfaceWindows(VimInterface):
-    BRACES = re.compile("([}{])")
+    BRACES = regex.compile("([}{])")
     WIN_ESCAPES = ["+", "^", "%", "~", "[", "]", "<", ">", "(", ")"]
     WIN_REPLACES = [
         (BS, "{BS}"),

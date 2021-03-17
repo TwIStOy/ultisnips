@@ -2,7 +2,7 @@
 
 from functools import wraps
 import traceback
-import re
+import regex
 import sys
 
 from UltiSnips import vim_helper
@@ -29,8 +29,8 @@ Following is the full stack trace:
             msg += traceback.format_exc()
             if hasattr(e, "snippet_info"):
                 msg += "\nSnippet, caused error:\n"
-                msg += re.sub(r"^(?=\S)", "  ", e.snippet_info,
-                              flags=re.MULTILINE)
+                msg += regex.sub(r"^(?=\S)", "  ", e.snippet_info,
+                              flags=regex.MULTILINE)
             # snippet_code comes from _python_code.py, it's set manually for
             # providing error message with stacktrace of failed python code
             # inside of the snippet.

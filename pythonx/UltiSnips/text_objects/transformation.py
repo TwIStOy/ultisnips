@@ -3,7 +3,7 @@
 
 """Implements TabStop transformations."""
 
-import re
+import regex
 import sys
 
 from UltiSnips.text import unescape, fill_in_whitespace
@@ -73,10 +73,10 @@ def _replace_conditional(match, string):
     return string
 
 
-_ONE_CHAR_CASE_SWITCH = re.compile(r"\\([ul].)", re.DOTALL)
-_LONG_CASEFOLDINGS = re.compile(r"\\([UL].*?)\\E", re.DOTALL)
-_DOLLAR = re.compile(r"\$(\d+)", re.DOTALL)
-_CONDITIONAL = re.compile(r"\(\?(\d+):", re.DOTALL)
+_ONE_CHAR_CASE_SWITCH = regex.compile(r"\\([ul].)", regex.DOTALL)
+_LONG_CASEFOLDINGS = regex.compile(r"\\([UL].*?)\\E", regex.DOTALL)
+_DOLLAR = regex.compile(r"\$(\d+)", regex.DOTALL)
+_CONDITIONAL = regex.compile(r"\(\?(\d+):", regex.DOTALL)
 
 
 class _CleverReplace:
@@ -137,13 +137,13 @@ class TextObjectTransformation:
             if "g" in token.options:
                 self._match_this_many = 0
             if "i" in token.options:
-                flags |= re.IGNORECASE
+                flags |= regex.IGNORECASE
             if "m" in token.options:
-                flags |= re.MULTILINE
+                flags |= regex.MULTILINE
             if "a" in token.options:
                 self._convert_to_ascii = True
 
-        self._find = re.compile(token.search, flags | re.DOTALL)
+        self._find = regex.compile(token.search, flags | regex.DOTALL)
         self._replace = _CleverReplace(token.replace)
 
     def _transform(self, text):

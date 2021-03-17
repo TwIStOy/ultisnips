@@ -8,14 +8,14 @@ If there was no text visually selected, this will be the empty string.
 
 """
 
-import re
+import regex
 import textwrap
 
 from UltiSnips.indent_util import IndentUtil
 from UltiSnips.text_objects.transformation import TextObjectTransformation
 from UltiSnips.text_objects.base import NoneditableTextObject
 
-_REPLACE_NON_WS = re.compile(r"[^ \t]")
+_REPLACE_NON_WS = regex.compile(r"[^ \t]")
 
 
 class Visual(NoneditableTextObject, TextObjectTransformation):

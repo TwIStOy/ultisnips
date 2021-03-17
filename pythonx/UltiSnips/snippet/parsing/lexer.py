@@ -5,7 +5,7 @@
 definitions into logical units called Tokens."""
 
 import string
-import re
+import regex
 
 from UltiSnips.position import Position
 from UltiSnips.text import unescape
@@ -130,7 +130,7 @@ class TabStopToken(Token):
 
     """${1:blub}"""
 
-    CHECK = re.compile(r"^\${\d+[:}]")
+    CHECK = regex.compile(r"^\${\d+[:}]")
 
     @classmethod
     def starts_here(cls, stream):
@@ -161,7 +161,7 @@ class VisualToken(Token):
 
     """${VISUAL}"""
 
-    CHECK = re.compile(r"^\${VISUAL[:}/]")
+    CHECK = regex.compile(r"^\${VISUAL[:}/]")
 
     @classmethod
     def starts_here(cls, stream):
@@ -200,7 +200,7 @@ class TransformationToken(Token):
 
     """${1/match/replace/options}"""
 
-    CHECK = re.compile(r"^\${\d+\/")
+    CHECK = regex.compile(r"^\${\d+\/")
 
     @classmethod
     def starts_here(cls, stream):
@@ -234,7 +234,7 @@ class MirrorToken(Token):
 
     """$1."""
 
-    CHECK = re.compile(r"^\$\d+")
+    CHECK = regex.compile(r"^\$\d+")
 
     @classmethod
     def starts_here(cls, stream):
@@ -257,7 +257,7 @@ class ChoicesToken(Token):
          so its content will not be parsed recursively.
     """
 
-    CHECK = re.compile(r"^\${\d+\|")
+    CHECK = regex.compile(r"^\${\d+\|")
 
     @classmethod
     def starts_here(cls, stream):
@@ -356,7 +356,7 @@ class PythonCodeToken(Token):
 
     """`!p snip.rv = "Hi"`"""
 
-    CHECK = re.compile(r"^`!p\s")
+    CHECK = regex.compile(r"^`!p\s")
 
     @classmethod
     def starts_here(cls, stream):
@@ -389,7 +389,7 @@ class VimLCodeToken(Token):
 
     """`!v g:hi`"""
 
-    CHECK = re.compile(r"^`!v\s")
+    CHECK = regex.compile(r"^`!v\s")
 
     @classmethod
     def starts_here(cls, stream):

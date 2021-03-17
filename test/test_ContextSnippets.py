@@ -68,7 +68,7 @@ class ContextSnippets_UseContext(_VimTest):
 class ContextSnippets_SnippetPriority(_VimTest):
     files = {
         "us/all.snippets": r"""
-        snippet i "desc" "re.search('err :=', snip.buffer[snip.line-1])" e
+        snippet i "desc" "regex.search('err :=', snip.buffer[snip.line-1])" e
         if err != nil {
             ${1:// pass}
         }

@@ -242,7 +242,7 @@ class PythonCode(NoneditableTextObject):
         self._snip = SnippetUtil(token.indent, mode, text, context, snippet)
 
         self._codes = (
-            "import re, os, vim, string, random",
+            "import regex, os, vim, string, random",
             "\n".join(snippet.globals.get("!p", [])).replace("\r\n", "\n"),
             token.code.replace("\\`", "`"),
         )
