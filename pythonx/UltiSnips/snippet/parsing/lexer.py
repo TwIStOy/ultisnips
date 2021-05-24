@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # encoding: utf-8
 
 """Not really a lexer in the classical sense, but code to convert snippet
@@ -75,7 +75,7 @@ def _parse_till_closing_brace(stream):
     rv = ""
     in_braces = 1
     while True:
-        if EscapeCharToken.starts_here(stream, "{}"):
+        if EscapeCharToken.starts_here(stream, "\\{}"):
             rv += next(stream) + next(stream)
         else:
             char = next(stream)
