@@ -9,10 +9,11 @@ import vim
 import textwrap
 
 from UltiSnips import vim_helper
+from UltiSnips.error import PebkacError
 from UltiSnips.indent_util import IndentUtil
+from UltiSnips.position import Position
 from UltiSnips.text import escape
 from UltiSnips.text_objects import SnippetInstance
-from UltiSnips.position import Position
 from UltiSnips.text_objects.python_code import SnippetUtilForAction
 
 __WHITESPACE_SPLIT = regex.compile(r"\s")
@@ -136,7 +137,7 @@ class SnippetDefinition:
             return match
         return False
 
-    def _context_match(self, visual_content):
+    def _context_match(self, visual_content, before):
         # skip on empty buffer
         if len(vim.current.buffer) == 1 and vim.current.buffer[0] == "":
             return
@@ -146,6 +147,7 @@ class SnippetDefinition:
             "visual_mode": "",
             "visual_text": "",
             "last_placeholder": None,
+            "before": before,
         }
 
         if visual_content:
@@ -179,7 +181,7 @@ class SnippetDefinition:
         snip = SnippetUtilForAction(locals)
 
         try:
-            exec(code, {"snip": snip})
+            exec(code, {"snip": snip, "match": self._last_re})
         except Exception as e:
             self._make_debug_exception(e, code)
             raise
@@ -216,7 +218,7 @@ class SnippetDefinition:
                         cursor_invalid = True
 
                 if cursor_invalid:
-                    raise RuntimeError(
+                    raise PebkacError(
                         "line under the cursor was modified, but "
                         + '"snip.cursor" variable is not set; either set set '
                         + '"snip.cursor" to new cursor position, or do not '
@@ -329,7 +331,7 @@ class SnippetDefinition:
 
         self._context = None
         if match and self._context_code:
-            self._context = self._context_match(visual_content)
+            self._context = self._context_match(visual_content, before)
             if not self.context:
                 match = False
 

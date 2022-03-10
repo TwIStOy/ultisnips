@@ -1,4 +1,4 @@
-*UltiSnips.txt*    For Vim version 7.4 or later.
+*UltiSnips.txt*    For Vim version 8.0 or later.
 
         The Ultimate Plugin for Snippets in Vim~
 
@@ -55,9 +55,10 @@ UltiSnips                                      *snippet* *snippets* *UltiSnips*
 5. UltiSnips and Other Plugins                  |UltiSnips-other-plugins|
    5.1 Existing Integrations                    |UltiSnips-integrations|
    5.2 Extending UltiSnips                      |UltiSnips-extending|
-6. FAQ                                          |UltiSnips-FAQ|
-7. Helping Out                                  |UltiSnips-helping|
-8. Contributors                                 |UltiSnips-contributors|
+6. Debugging                                    |UltiSnips-Debugging|
+7. FAQ                                          |UltiSnips-FAQ|
+8. Helping Out                                  |UltiSnips-helping|
+9. Contributors                                 |UltiSnips-contributors|
 
 This plugin only works if 'compatible' is not set.
 {Vi does not have any of these features}
@@ -92,7 +93,7 @@ http://vimcasts.org/episodes/ultisnips-visual-placeholder/
 1.1 Requirements                                     *UltiSnips-requirements*
 ----------------
 
-This plugin works with Vim version 7.4 or later with Python 3 support enabled.
+This plugin works with Vim version 8.0 or later with Python 3 support enabled.
 It only works if the 'compatible' setting is not set.
 
 The Python 3.x interface must be available. In other words, Vim
@@ -399,7 +400,7 @@ The first function is UltiSnips#AddSnippetWithPriority(trigger, value, descripti
 options, filetyp, priority). It adds a new snippet to the current list of
 snippets. See |UltiSnips-authoring-snippets| for details most of the function
 arguments. The priority is a number that defines which snippet should be
-preferred over others. See the priority keyword in |UltiSnips-add-snippets|.
+preferred over others. See the priority keyword in |UltiSnips-basic-syntax|.
 
 
  3.4.2 UltiSnips#Anon                                        *UltiSnips#Anon*
@@ -683,7 +684,7 @@ The options currently supported are: >
        preceded and followed by non-word characters. Word characters are
        defined by the 'iskeyword' setting. Use this option, for example, to
        permit expansion where the tab trigger follows punctuation without
-       expanding suffixes of larger words.
+       expanding suffixes of larger words. This option overrides 'i'.
 
    r   Regular expression - With this option, the tab trigger is expected to
        be a python regular expression. The snippet is expanded if the recently
@@ -691,7 +692,10 @@ The options currently supported are: >
        expression MUST be quoted (or surrounded with another character) like a
        multi-word tab trigger (see above) whether it has spaces or not. A
        resulting match is passed to any python code blocks in the snippet
-       definition as the local variable "match".
+       definition as the local variable "match". Regular expression snippets
+       can be triggered in-word by default. To avoid this you can start your
+       regex pattern with '\b', although this will not respect your
+       'iskeyword' setting.
 
    t   Do not expand tabs - If a snippet definition includes leading tab
        characters, by default UltiSnips expands the tab characters honoring
@@ -1057,9 +1061,9 @@ wow<tab>Hello World ->
 Hello World                                                     HELLO WORLD
 
 Python global functions can be stored in a python module and then imported.
-This makes global functions easily accessible to all snippet files. Since Vim
-7.4 you can just drop python files into ~/.vim/pythonx and import them
-directly inside your snippets. For example to use
+This makes global functions easily accessible to all snippet files. You can
+just drop python files into ~/.vim/pythonx and import them directly inside
+your snippets. For example to use
 ~/.vim/pythonx/my_snippets_helpers.py  >
 
    global !p
@@ -1431,7 +1435,7 @@ In that case snippet should be defined using this syntax: >
 
     snippet trigger_word "description" "expression" options
 
-The context can be defined using a special header: >
+The context can also be defined using a special header: >
 
     context "python_expression"
     snippet trigger_word "description" options
@@ -1462,8 +1466,15 @@ Global variable `snip` will be available with following properties:
         - 'current_text' - text in the placeholder on the moment of selection;
         - 'start' - placeholder start on the moment of selection;
         - 'end' - placeholder end on the moment of selection;
+    'snip.before' - contains the text in the current line up to and including
+        the matched snippet. Since 'snip.column' counts bytes, not characters,
+        this is **not** equivalent to 'snip.buffer[snip.line][:snip.column+1]'.
+        This property is only available in the scope of contexts but not in
+        that of actions.
 
 
+For regular expression triggered snippets the variable `match` will contain
+the return value of the match of the regular expression. See http://docs.python.org/library/re.html#match-objects.
 
 ------------------- SNIP -------------------
 snippet r "return" "re.match('^\s+if err ', snip.buffer[snip.line-1])" be
@@ -1560,7 +1571,7 @@ There are three types of actions:
 
 Specified code will be evaluated at stages defined above and same global
 variables and modules will be available that are stated in
-the |UltiSnips-custom-context-snippets| section.
+the |UltiSnips-custom-context-snippets| section (except 'snip.before').
 
                                                 *UltiSnips-buffer-proxy*
 
@@ -1721,8 +1732,6 @@ endsnippet
 4.11 Autotrigger                                       *UltiSnips-autotrigger*
 ----------------
 
-Note: vim must be newer than 7.4.214 to support this feature.
-
 Many language constructs can occur only at specific places, so it's
 possible to use snippets without manually triggering them.
 
@@ -1781,6 +1790,10 @@ offers out of the box completion dialogue support for it too.
 deoplete - The successor of neocomplete is also supported. The completion 
 source is called 'ultisnips'.
 
+vim-easycomplete - Vim-EasyComplete needs ultisnips and vim-snippets for 
+snippets support. This two plugin is compatible with EasyComplete out of
+the box. More information: <https://github.com/jayli/vim-easycomplete>
+
 unite - UltiSnips has a source for unite. As an example of how you can use
 it add the following function and mappings to your vimrc: >
 
@@ -1811,7 +1824,18 @@ AddNewSnippetSource. Please contact us on github if you integrate UltiSnips
 with your plugin so it can be listed in the docs.
 
 =============================================================================
-6. FAQ                                                        *UltiSnips-FAQ*
+6. Debugging                                            *UltiSnips-Debugging*
+
+UltiSnips comes with a remote debugger disabled
+by default. When authoring a complex snippet
+with python code, you may want to be able to
+set breakpoints to inspect variables.
+It is also useful when debugging UltiSnips itself.
+
+See |UltiSnips-Advanced-Debugging| for more informations
+
+=============================================================================
+7. FAQ                                                        *UltiSnips-FAQ*
 
 Q: Do I have to call UltiSnips#ExpandSnippet() to check if a snippet is
    expandable? Is there instead an analog of neosnippet#expandable?
@@ -1835,7 +1859,7 @@ A: Yes there is, try
   endfunction
 
 =============================================================================
-7. Helping Out                                            *UltiSnips-helping*
+8. Helping Out                                            *UltiSnips-helping*
 
 UltiSnips needs the help of the Vim community to keep improving. Please
 consider joining this effort by providing new features or bug reports.
@@ -1849,7 +1873,7 @@ You can contribute by fixing or reporting bugs in our issue tracker:
 https://github.com/sirver/ultisnips/issues
 
 =============================================================================
-8. Contributors                                      *UltiSnips-contributors*
+9. Contributors                                      *UltiSnips-contributors*
 
 UltiSnips has been started and maintained from Jun 2009 - Dec 2015 by Holger
 Rapp (@SirVer, SirVer@gmx.de). Up to April 2018 it was maintained by Stanislav

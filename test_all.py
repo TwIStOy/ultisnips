@@ -118,11 +118,11 @@ if __name__ == "__main__":
             "multiplexer and race conditions in writing to the file system.",
         )
         p.add_option(
-            "-x",
-            "--exitfirst",
-            dest="exitfirst",
+            "-f",
+            "--failfast",
+            dest="failfast",
             action="store_true",
-            help="exit instantly on first error or failed test.",
+            help="Stop the test run on the first error or failure.",
         )
         p.add_option(
             "--vim",
@@ -155,6 +155,32 @@ if __name__ == "__main__":
             default="",
             help="If set, each test will check sys.version inside of vim to "
             "verify we are testing against the expected Python version.",
+        )
+        p.add_option(
+            "--remote-pdb",
+            dest="pdb_enable",
+            action="store_true",
+            help="If set, The remote pdb server will be run",
+        )
+        p.add_option(
+            "--remote-pdb-host",
+            dest="pdb_host",
+            type=str,
+            default="localhost",
+            help="Remote pdb server host",
+        )
+        p.add_option(
+            "--remote-pdb-port",
+            dest="pdb_port",
+            type=int,
+            default=8080,
+            help="Remote pdb server port",
+        )
+        p.add_option(
+            "--remote-pdb-non-blocking",
+            dest="pdb_block",
+            action="store_false",
+            help="If set, the server will not freeze vim on error",
         )
 
         o, args = p.parse_args()
@@ -203,6 +229,10 @@ if __name__ == "__main__":
             test.expected_python_version = options.expected_python_version
             test.vim = vim
             test.vim_flavor = vim_flavor
+            test.pdb_enable = options.pdb_enable
+            test.pdb_host = options.pdb_host
+            test.pdb_port = options.pdb_port
+            test.pdb_block = options.pdb_block
             all_other_plugins.update(test.plugins)
 
             if len(selected_tests):
@@ -219,7 +249,7 @@ if __name__ == "__main__":
 
         v = 2 if options.verbose else 1
         successfull = (
-            unittest.TextTestRunner(verbosity=v, failfast=options.exitfirst)
+            unittest.TextTestRunner(verbosity=v, failfast=options.failfast)
             .run(suite)
             .wasSuccessful()
         )
